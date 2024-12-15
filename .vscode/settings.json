@@ -1,0 +1,12 @@
+{
+    "files.associations": {
+        "*.cc": "cpp",
+        "*.asp": "asp",
+        "string": "cpp",
+        "__hash_table": "cpp",
+        "__tree": "cpp",
+        "map": "cpp",
+        "string_view": "cpp",
+        "unordered_map": "cpp"
+    }
+}

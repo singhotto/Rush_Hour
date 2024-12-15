@@ -97,6 +97,7 @@ not_fully_occupied_range2(0, (X, Y1), (X, Y2)) :-
     Y = Y1..Y2, 
     not not_occupied(0, (X, Y)).
 
+
 % Vertical
 get_r((R1, C), (R2, C), (R2, C), (R4, C), L) :-
     dim((R1, C)),
@@ -104,7 +105,7 @@ get_r((R1, C), (R2, C), (R2, C), (R4, C), L) :-
     dim((R4, C)),
     len(L),
     R1 > R2+L-1,
-    R4 = R2 + L - 1.
+    R4 = R1- 1.
 
 get_r((R1, C), (R2, C), (R3, C), (R4, C), L) :-
     dim((R1, C)),
@@ -126,15 +127,17 @@ get_r((R1, C), (R2, C), (R3, C), (R4, C), L) :-
     R2 < R1,
     R1 <= R2+L-1,
     R3 = R2 + L,
-    R4 = R3 + L - 1.
+    R4 = R1 - 1.
 
-get_r((R1, C), (R2, C), (R2, C), (R4, C), L) :-
+get_r((R1, C), (R2, C), (R3, C), (R4, C), L) :-
     dim((R1, C)),
     dim((R2, C)),
+    dim((R3, C)),
     dim((R4, C)),
     len(L),
     R2 > R1+L-1,
-    R3 = R2 + L - 1.
+    R3 = R1 + L,
+    R4 = R2 + L - 1.
 
 
 % Horizontal
@@ -144,7 +147,7 @@ get_r((R, C1), (R, C2), (R, C2), (R, C4), L) :-
     dim((R, C4)),
     len(L),
     C1 > C2+L-1,
-    C4 = C2 + L - 1.
+    C4 = C1 - 1.
 
 get_r((R, C1), (R, C2), (R, C3), (R, C4), L) :-
     dim((R, C1)),
@@ -165,16 +168,18 @@ get_r((R, C1), (R, C2), (R, C3), (R, C4), L) :-
     len(L),
     C2 < C1,
     C1 <= C2+L-1,
-    C3 = C2 + L,
-    C4 = C3 + L - 1.
+    C3 = C2,
+    C4 = C1 - 1.
 
-get_r((R, C1), (R, C2), (R, C2), (R, C4), L) :-
+get_r((R, C1), (R, C2), (R, C3), (R, C4), L) :-
     dim((R, C1)),
     dim((R, C2)),
+    dim((R, C3)),
     dim((R, C4)),
     len(L),
     C2 > C1+L-1,
-    C3 = C2 + L - 1.
+    C3 = C1+L,
+    C4 = C2 + L - 1.
 
 #program step(t).
 
@@ -211,6 +216,10 @@ occupied(t, (R, C)) :-
     at(t, L, h, (R, C1), _),
     C >= C1, C < C1+L.
 
+not_occupied(t, A) :-
+    dim(A),
+    time(T),
+    not occupied(t, A).
 
 % Occupied range for horizontal lines
 occupied_range(t, (X1, Y), (X2, Y)) :- 
