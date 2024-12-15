@@ -29,81 +29,92 @@ n((R, C), (R + DR, C + DC)) :- dim((R, C)), dim((R + DR, C + DC)), d(DR, DC).
 
 at(0, L, V, A, N) :- car(N, L, V, A).
 
-occupied(0, (R, C)) :- at(0, L, v, (R1, C), _), dim((R, C)), R >= R1, R<L+R1.
-occupied(0, (R, C)) :- at(0, L, h, (R, C1), _), dim((R, C)), C >= C1, C<L+C1.
+occupied(0, (R, C)) :- 
+    dim((R, C)),
+    dim((R, C1)),
+    at(0, L, h, (R, C1), _),
+    C1 <= C,                        
+    C < C1 + L.                     
 
-not_occupied(0, A) :- 
+occupied(0, (R, C)) :- 
+    dim((R, C)),
+    dim((R1, C)),
+    at(0, L, v, (R1, C), _),
+    R1 <= R,                        
+    R < R1 + L.                    
+
+not_occupied(0, A) :-
     dim(A),
     not occupied(0, A).
 
 % Occupied range for horizontal lines
-occupied_range(0, (X1, Y), (X2, Y)) :- 
-    X1 <= X2, 
-    dim((X1, Y)), 
-    dim((X2, Y)), 
+occupied_range(0, (X1, Y), (X2, Y)) :-
+    X1 <= X2,
+    dim((X1, Y)),
+    dim((X2, Y)),
     not not_fully_occupied_range1(0, (X1, Y), (X2, Y)).
 
 % Occupied range for vertical lines
-occupied_range(0, (X, Y1), (X, Y2)) :- 
-    Y1 <= Y2, 
-    dim((X, Y1)), 
-    dim((X, Y2)), 
+occupied_range(0, (X, Y1), (X, Y2)) :-
+    Y1 <= Y2,
+    dim((X, Y1)),
+    dim((X, Y2)),
     not not_fully_occupied_range1(0, (X, Y1), (X, Y2)).
 
 % Not Occupied range for horizontal lines
-not_occupied_range(0, (X1, Y), (X2, Y)) :- 
-    X1 <= X2, 
-    dim((X1, Y)), 
-    dim((X2, Y)), 
+not_occupied_range(0, (X1, Y), (X2, Y)) :-
+    X1 <= X2,
+    dim((X1, Y)),
+    dim((X2, Y)),
     not not_fully_occupied_range2(0, (X1, Y), (X2, Y)).
 
 % Not Occupied range for vertical lines
-not_occupied_range(0, (X, Y1), (X, Y2)) :- 
-    Y1 <= Y2, 
-    dim((X, Y1)), 
-    dim((X, Y2)), 
+not_occupied_range(0, (X, Y1), (X, Y2)) :-
+    Y1 <= Y2,
+    dim((X, Y1)),
+    dim((X, Y2)),
     not not_fully_occupied_range2(0, (X, Y1), (X, Y2)).
 
 % Define when a range is NOT fully occupied (horizontal)
-not_fully_occupied_range1(0, (X1, Y), (X2, Y)) :- 
-    X1 <= X2, 
-    dim((X1, Y)), 
-    dim((X2, Y)), 
-    X = X1..X2, 
+not_fully_occupied_range1(0, (X1, Y), (X2, Y)) :-
+    X1 <= X2,
+    dim((X1, Y)),
+    dim((X2, Y)),
+    X = X1..X2,
     not occupied(0, (X, Y)).
 
 % Define when a range is NOT fully occupied (vertical)
-not_fully_occupied_range1(0, (X, Y1), (X, Y2)) :- 
-    Y1 <= Y2, 
-    dim((X, Y1)), 
-    dim((X, Y2)), 
-    Y = Y1..Y2, 
+not_fully_occupied_range1(0, (X, Y1), (X, Y2)) :-
+    Y1 <= Y2,
+    dim((X, Y1)),
+    dim((X, Y2)),
+    Y = Y1..Y2,
     not occupied(0, (X, Y)).
 
 
 % Define when a range is NOT fully occupied (horizontal)
-not_fully_occupied_range2(0, (X1, Y), (X2, Y)) :- 
-    X1 <= X2, 
-    dim((X1, Y)), 
-    dim((X2, Y)), 
-    X = X1..X2, 
+not_fully_occupied_range2(0, (X1, Y), (X2, Y)) :-
+    X1 <= X2,
+    dim((X1, Y)),
+    dim((X2, Y)),
+    X = X1..X2,
     not not_occupied(0, (X, Y)).
 
 % Define when a range is NOT fully occupied (vertical)
-not_fully_occupied_range2(0, (X, Y1), (X, Y2)) :- 
-    Y1 <= Y2, 
-    dim((X, Y1)), 
-    dim((X, Y2)), 
-    Y = Y1..Y2, 
+not_fully_occupied_range2(0, (X, Y1), (X, Y2)) :-
+    Y1 <= Y2,
+    dim((X, Y1)),
+    dim((X, Y2)),
+    Y = Y1..Y2,
     not not_occupied(0, (X, Y)).
-
 
 % Vertical
 get_r((R1, C), (R2, C), (R2, C), (R4, C), L) :-
     dim((R1, C)),
     dim((R2, C)),
     dim((R4, C)),
-    len(L),
+    R1+L <= 6, R2+L-1 <= 6,
+    car(_, L, _, _),
     R1 > R2+L-1,
     R4 = R1- 1.
 
@@ -112,7 +123,8 @@ get_r((R1, C), (R2, C), (R3, C), (R4, C), L) :-
     dim((R2, C)),
     dim((R3, C)),
     dim((R4, C)),
-    len(L),
+    R1+L <= 6, R2+L-1 <= 6,
+    car(_, L, _, _),
     R2 > R1,
     R2 <= R1+L-1,
     R3 = R1 + L,
@@ -123,10 +135,11 @@ get_r((R1, C), (R2, C), (R3, C), (R4, C), L) :-
     dim((R2, C)),
     dim((R3, C)),
     dim((R4, C)),
-    len(L),
+    R1+L <= 6, R2+L-1 <= 6,
+    car(_, L, _, _),
     R2 < R1,
     R1 <= R2+L-1,
-    R3 = R2 + L,
+    R3 = R2,
     R4 = R1 - 1.
 
 get_r((R1, C), (R2, C), (R3, C), (R4, C), L) :-
@@ -134,7 +147,8 @@ get_r((R1, C), (R2, C), (R3, C), (R4, C), L) :-
     dim((R2, C)),
     dim((R3, C)),
     dim((R4, C)),
-    len(L),
+    R1+L <= 6, R2+L-1 <= 6,
+    car(_, L, _, _),
     R2 > R1+L-1,
     R3 = R1 + L,
     R4 = R2 + L - 1.
@@ -145,7 +159,8 @@ get_r((R, C1), (R, C2), (R, C2), (R, C4), L) :-
     dim((R, C1)),
     dim((R, C2)),
     dim((R, C4)),
-    len(L),
+    C1+L <= 6, C2+L-1 <= 6,
+    car(_, L, _, _),
     C1 > C2+L-1,
     C4 = C1 - 1.
 
@@ -154,7 +169,8 @@ get_r((R, C1), (R, C2), (R, C3), (R, C4), L) :-
     dim((R, C2)),
     dim((R, C3)),
     dim((R, C4)),
-    len(L),
+    C1+L <= 6, C2+L-1 <= 6,
+    car(_, L, _, _),
     C2 > C1,
     C2 <= C1+L-1,
     C3 = C1 + L,
@@ -165,7 +181,8 @@ get_r((R, C1), (R, C2), (R, C3), (R, C4), L) :-
     dim((R, C2)),
     dim((R, C3)),
     dim((R, C4)),
-    len(L),
+    C1+L <= 6, C2+L-1 <= 6,
+    car(_, L, _, _),
     C2 < C1,
     C1 <= C2+L-1,
     C3 = C2,
@@ -176,7 +193,8 @@ get_r((R, C1), (R, C2), (R, C3), (R, C4), L) :-
     dim((R, C2)),
     dim((R, C3)),
     dim((R, C4)),
-    len(L),
+    C1+L <= 6, C2+L-1 <= 6,
+    car(_, L, _, _),
     C2 > C1+L-1,
     C3 = C1+L,
     C4 = C2 + L - 1.
@@ -184,7 +202,7 @@ get_r((R, C1), (R, C2), (R, C3), (R, C4), L) :-
 #program step(t).
 
 % Allow valid moves for cars based on their orientation and position
-1 { move(t, (R1, C), (R2, C), N) : n((R, C), (R2, C)) } 1 :-
+1 { move(t, (R1, C), (R2, C), N) : n((R1, C), (R2, C)) } 1 :-
     not_occupied_range(t-1, (R3, C), (R4, C)),
     at(t-1, L, v, (R1, C), N),
     get_r((R1, C), (R2, C), (R3, C), (R4, C), L).
@@ -195,91 +213,95 @@ get_r((R, C1), (R, C2), (R, C3), (R, C4), L) :-
     get_r((R, C1), (R, C2), (R, C3), (R, C4), L).
 
 % Ensure moves respect the grid dimensions
+:- 2 { move(t, A, B, N) : dim(B) }, dim(A), car(N, _, _, _).
 :- move(t, A, B, N), dim(A), car(N, _, _, _), not dim(B).
-:- 2 { move(t,A,B, _) }, dim(A), dim(B).
 
-at(t, L, D, A, N) :- 
-    at(t-1, L, D, A, N), 
+at(t, L, D, A, N) :-
+    at(t-1, L, D, A, N),
     not move(t, A, _, N).
 
 at(t, L, D, B, N) :-
     at(t-1, L, D, A, N),
     move(t, A, B, N).
 
-occupied(t, (R, C)) :-
-    dim((R, C)),
-    at(t, L, v, (R1, C), _),
-    R >= R1, R < R1+L.
 
-occupied(t, (R, C)) :-
+occupied(t, (R, C)) :- 
     dim((R, C)),
+    dim((R, C1)),
     at(t, L, h, (R, C1), _),
-    C >= C1, C < C1+L.
+    C1 <= C,                        
+    C < C1 + L.                     
+
+occupied(t, (R, C)) :- 
+    dim((R, C)),
+    dim((R1, C)),
+    at(t, L, v, (R1, C), _),
+    R1 <= R,                        
+    R < R1 + L.                    
 
 not_occupied(t, A) :-
     dim(A),
-    time(T),
     not occupied(t, A).
 
 % Occupied range for horizontal lines
-occupied_range(t, (X1, Y), (X2, Y)) :- 
-    X1 <= X2, 
-    dim((X1, Y)), 
-    dim((X2, Y)), 
+occupied_range(t, (X1, Y), (X2, Y)) :-
+    X1 <= X2,
+    dim((X1, Y)),
+    dim((X2, Y)),
     not not_fully_occupied_range1(t, (X1, Y), (X2, Y)).
 
 % Occupied range for vertical lines
-occupied_range(t, (X, Y1), (X, Y2)) :- 
-    Y1 <= Y2, 
-    dim((X, Y1)), 
-    dim((X, Y2)), 
+occupied_range(t, (X, Y1), (X, Y2)) :-
+    Y1 <= Y2,
+    dim((X, Y1)),
+    dim((X, Y2)),
     not not_fully_occupied_range1(t, (X, Y1), (X, Y2)).
 
 % Not Occupied range for horizontal lines
-not_occupied_range(t, (X1, Y), (X2, Y)) :- 
-    X1 <= X2, 
-    dim((X1, Y)), 
-    dim((X2, Y)), 
+not_occupied_range(t, (X1, Y), (X2, Y)) :-
+    X1 <= X2,
+    dim((X1, Y)),
+    dim((X2, Y)),
     not not_fully_occupied_range2(t, (X1, Y), (X2, Y)).
 
 % Not Occupied range for vertical lines
-not_occupied_range(t, (X, Y1), (X, Y2)) :- 
-    Y1 <= Y2, 
-    dim((X, Y1)), 
-    dim((X, Y2)), 
+not_occupied_range(t, (X, Y1), (X, Y2)) :-
+    Y1 <= Y2,
+    dim((X, Y1)),
+    dim((X, Y2)),
     not not_fully_occupied_range2(t, (X, Y1), (X, Y2)).
 
 % Define when a range is NOT fully occupied (horizontal)
-not_fully_occupied_range1(t, (X1, Y), (X2, Y)) :- 
-    X1 <= X2, 
-    dim((X1, Y)), 
-    dim((X2, Y)), 
-    X = X1..X2, 
+not_fully_occupied_range1(t, (X1, Y), (X2, Y)) :-
+    X1 <= X2,
+    dim((X1, Y)),
+    dim((X2, Y)),
+    X = X1..X2,
     not occupied(t, (X, Y)).
 
 % Define when a range is NOT fully occupied (vertical)
-not_fully_occupied_range1(t, (X, Y1), (X, Y2)) :- 
-    Y1 <= Y2, 
-    dim((X, Y1)), 
-    dim((X, Y2)), 
-    Y = Y1..Y2, 
+not_fully_occupied_range1(t, (X, Y1), (X, Y2)) :-
+    Y1 <= Y2,
+    dim((X, Y1)),
+    dim((X, Y2)),
+    Y = Y1..Y2,
     not occupied(t, (X, Y)).
 
 
 % Define when a range is NOT fully occupied (horizontal)
-not_fully_occupied_range2(t, (X1, Y), (X2, Y)) :- 
-    X1 <= X2, 
-    dim((X1, Y)), 
-    dim((X2, Y)), 
-    X = X1..X2, 
+not_fully_occupied_range2(t, (X1, Y), (X2, Y)) :-
+    X1 <= X2,
+    dim((X1, Y)),
+    dim((X2, Y)),
+    X = X1..X2,
     not not_occupied(t, (X, Y)).
 
 % Define when a range is NOT fully occupied (vertical)
-not_fully_occupied_range2(t, (X, Y1), (X, Y2)) :- 
-    Y1 <= Y2, 
-    dim((X, Y1)), 
-    dim((X, Y2)), 
-    Y = Y1..Y2, 
+not_fully_occupied_range2(t, (X, Y1), (X, Y2)) :-
+    Y1 <= Y2,
+    dim((X, Y1)),
+    dim((X, Y2)),
+    Y = Y1..Y2,
     not not_occupied(t, (X, Y)).
 
 

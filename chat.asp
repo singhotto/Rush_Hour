@@ -104,19 +104,41 @@ occupied((X, Y), 0) :- dim((X, Y)),  car(_, L, h, (X, Y1)), Y >= Y1, Y < Y1 + L.
 
 % move((X1, Y1), (X2, Y2), T + 1) :- at(T, (X1, Y1), _), can_move((X1, Y1), (X2, Y2), T), time(T).
 
-1 { move(A, B, T + 1) : can_move(A, B, T) } 1 :- dim(B), not at(T, B, _), time(T).
+1 { move(A, B, T + 1) : can_move(A, B, T) } 1 :- dim(B), time(T+1).
 :- 2 { move(A,B, T + 1) }, dim(A).
 
-at(T + 1,A,N) :- at(T,A,N), not move(A,_, T + 1), time(T).
-at(T + 1,B,N) :- at(T,A,N),     move(A,B, T + 1), time(T).
+
+at(T + 1, L, D, A, N) :-
+    at(T, L, D, A, N),
+    time(T + 1),
+    not move(T + 1, A, _).
+
+at(T + 1, L, D, B, N) :-
+    at(T, L, D, A, N),
+    time(T + 1),
+    move(T + 1, A, B).
+
+occupied(T + 1, (R, C)) :- 
+    dim((R, C)),
+    dim((R, C1)),
+    at(T + 1, L, h, (R, C1), _),
+    C1 <= C,                        
+    C < C1 + L.                     
+
+occupied(T + 1, (R, C)) :- 
+    dim((R, C)),
+    dim((R1, C)),
+    at(T + 1, L, v, (R1, C), _),
+    R1 <= R,                        
+    R < R1 + L.           
 
 % 1 { at(T, A, N) : dim(A) } 1 :- car(N, _, _, _), time(T).
 % :- at(T, A, N1), at(T, A, N2), N1 != N2, time(T).
 
-pred(T, T1) :- time(T), time(T1), T1 = T - 1.
+% pred(T, T1) :- time(T), time(T1), T1 = T - 1.
 
-:- move(T, A, _), pred(T, T1), not at(T1, A, _).
-:- move(T, A, B), pred(T, T1), move(T1, B, A).
+% :- move(T, A, _), pred(T, T1), not at(T1, A, _).
+% :- move(T, A, B), pred(T, T1), move(T1, B, A).
 
 
 

@@ -194,33 +194,38 @@ get_r((R, C1), (R, C2), (R, C3), (R, C4), L) :-
     C3 = C1+L,
     C4 = C2 + L - 1.
 
-% Allow valid moves for cars based on their orientation and position
-1 { move(T + 1, (R1, C), (R2, C), N) : n((R1, C), (R2, C)) } 1 :-
+1 { move(T + 1, (R1, C), (R2, C)) : n((R1, C), (R2, C)) } 1 :-
     not_occupied_range(T, (R3, C), (R4, C)),
-    at(T, L, v, (R1, C), N),
+    at(T, L, v, (R1, C), _),
     time(T + 1),
     get_r((R1, C), (R2, C), (R3, C), (R4, C), L).
 
-1 { move(T + 1, (R, C1), (R, C2), N) : n((R, C1), (R, C2)) } 1 :-
+1 { move(T + 1, (R, C1), (R, C2)) : n((R, C1), (R, C2)) } 1 :-
     not_occupied_range(T, (R, C3), (R, C4)),
-    at(T, L, h, (R, C1), N),
+    at(T, L, h, (R, C1), _),
     time(T + 1),
     get_r((R, C1), (R, C2), (R, C3), (R, C4), L).
 
 % Ensure moves respect the grid dimensions
-:- 2 { move(T + 1, A, B, N) : dim(B) }, dim(A), time(T), car(N, _, _, _).
-:- move(T, A, B, N), dim(A), time(T), car(N, _, _, _), not dim(B).
-:- 2 { move(T,A,B, _) }, dim(A), time(T), dim(B).
+% :- 2 { move(T + 1, A, B, N) : dim(B) }, dim(A), time(T), car(N, _, _, _).
+% :- move(T, A, B, N), dim(A), time(T), car(N, _, _, _), not dim(B).
+% % Ensure that no two cars move in the same time step
+% :- move(T + 1, _, _, N1), move(T + 1, _, _, N2), N1 != N2.
+
+
+% Ensure each car makes exactly one move at each time step
+% :- not 1 { move(T + 1, _, _, N) : car(N, _, _, _) } 1, time(T + 1).
+
 
 at(T + 1, L, D, A, N) :-
     at(T, L, D, A, N),
     time(T + 1),
-    not move(T + 1, A, _, N).
+    not move(T + 1, A, _).
 
 at(T + 1, L, D, B, N) :-
     at(T, L, D, A, N),
     time(T + 1),
-    move(T + 1, A, B, N).
+    move(T + 1, A, B).
 
 
 occupied(T + 1, (R, C)) :- 
@@ -324,13 +329,13 @@ not_fully_occupied_range2(T + 1, (X, Y1), (X, Y2)) :-
 % % check goal
 % :- exit(0, (3, 5)), not at(T, _, _, (3,5), 0), time(T), T = 70.
 
-#show at/5.
+% #show at/5.
 % #show n/2.
 % #show get_r/5.
-#show occupied/2.
+% #show occupied/2.
 % #show occupied_range/3.
 % #show not_occupied_range/3.
 % #show not_fully_occupied_range1/3.
 % #show not_fully_occupied_range2/3.
-#show move/4.
+#show move/3.
 % #show valid_move/3.

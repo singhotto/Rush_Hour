@@ -41,7 +41,7 @@ int main(int argc, char* argv[]) {
     }
 
     std::string filename = argv[1];
-    std::string command = "clingo -n 0 " + filename;
+    std::string command = "clingo -n 10 " + filename;
 
     // Open the command for reading
     FILE* pipe = popen(command.c_str(), "r");
