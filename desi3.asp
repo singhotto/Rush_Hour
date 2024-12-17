@@ -1,19 +1,5 @@
-% Input: Define grid size and vehicles
-grid_size(6). % A 6x6 grid
-
-car(0, 2, h, (3, 4)).
-car(1, 3, v, (1, 3)).
-car(2, 3, h, (4, 1)).
-car(3, 2, v, (4, 4)).
-car(4, 3, v, (2, 6)).
-car(5, 2, h, (5, 5)).
-
-dim((1..6, 1..6)).
-
-exit(0, (3, 5)).
-
 % Time domain
-time(0..20). % Limit the planning horizon to 10 steps
+time(0..18). % Limit the planning horizon to 10 steps
 
 at(0, L, D, A, N) :- car(N, L, D, A).
 
@@ -48,62 +34,60 @@ free_range(0, (X, Y1), (X, Y2)) :-
     not_occupied(0, (X, Y3)) : Y3 = Y1..Y2.
 
 % Verticle
-can_move((X1, Y), (X2, Y), 0) :- 
+can_move(N, (X1, Y), (X2, Y), 0) :- 
     dim((X1, Y)), dim((X2, Y)), 
     X1 != X2, time(0),
-    at(0, L, v, (X1, Y), _), 
+    at(0, L, v, (X1, Y), N), 
     P = X1 + L,
     A = X2 + L - 1,
     free_range(0, (P, Y), (A, Y)).
 
-can_move((X1, Y), (X2, Y), 0) :- 
+can_move(N, (X1, Y), (X2, Y), 0) :- 
     dim((X1, Y)), dim((X2, Y)), 
     X1 != X2, time(0),
-    at(0, L, v, (X1, Y), _), 
+    at(0, L, v, (X1, Y), N), 
     P = X2,
     A = X1 - 1,
     free_range(0, (P, Y), (A, Y)).
 
 % Horizontal
-can_move((X, Y1), (X, Y2), 0) :- 
+can_move(N, (X, Y1), (X, Y2), 0) :- 
     dim((X, Y1)), dim((X, Y2)), 
     Y1 != Y2, time(0),
-    at(0, L, h, (X, Y1), _), 
+    at(0, L, h, (X, Y1), N), 
     P = Y1 + L,
     A = Y2 + L - 1,
     free_range(0, (X, P), (X, A)).
 
-can_move((X, Y1), (X, Y2), 0) :- 
+can_move(N, (X, Y1), (X, Y2), 0) :- 
     dim((X, Y1)), dim((X, Y2)), 
     Y1 != Y2, time(0),
-    at(0, L, h, (X, Y1), _), 
+    at(0, L, h, (X, Y1), N), 
     P = Y2,
     A = Y1 - 1,
     free_range(0, (X, P), (X, A)).
 
-% move((X1, Y1), (X2, Y2), T + 1) :- at(T, (X1, Y1), _), can_move((X1, Y1), (X2, Y2), T), time(T).
+% 1 { move(1, A, B, N) : can_move(N, A, B, 0) } 1 :- time(1).
+% 1 { move(2, A, B, N) : can_move(N, A, B, 1) } 1 :- time(2).
 
-% 1 { move(1, A, B) : can_move(A, B, 0) } 1 :- time(1).
-% 1 { move(2, A, B) : can_move(A, B, 1) } 1 :- time(2).
-
-1 { move(T + 1, A, B) : can_move(A, B, T) } 1 :- time(T).
-:- 2 { move(T + 1, A,B) }, dim(A), dim(B).
+1 { move(T + 1, A, B, N) : can_move(N, A, B, T) } 1 :- time(T).
+:- 2 { move(T + 1, A,B, _) }, dim(A), dim(B).
 
 % some redundant constraints
 % :- move(T + 1,A,_), not at(T,_,_,A,_), time(T).
-:- move(T + 1, A, B), move(T, B, A), time(T).
+:- move(T + 1, A, B, N), move(T, B, A, N), time(T).
 % :- move(T + 1, A, B), goal(T), time(T + 1).
 
 
 at(T + 1, L, D, A, N) :-
     at(T, L, D, A, N),
     time(T + 1),
-    not move(T + 1, A, _).
+    not move(T + 1, A, _, N).
 
 at(T + 1, L, D, B, N) :-
     at(T, L, D, A, N),
     time(T + 1),
-    move(T + 1, A, B).
+    move(T + 1, A, B, N).
 
 
 occupied(T + 1, (R, C)) :- 
@@ -136,64 +120,53 @@ free_range(T+1, (X, Y1), (X, Y2)) :-
     not_occupied(T + 1, (X, Y3)) : Y3 = Y1..Y2.
 
 % Verticle
-can_move((X1, Y), (X2, Y), T + 1) :- 
+can_move(N, (X1, Y), (X2, Y), T + 1) :- 
     dim((X1, Y)), dim((X2, Y)), 
     X1 != X2, time(T + 1),
-    at(T + 1, L, v, (X1, Y), _), 
+    at(T + 1, L, v, (X1, Y), N), 
     P = X1 + L,
     A = X2 + L - 1,
     free_range(T+1, (P, Y), (A, Y)).
 
-can_move((X1, Y), (X2, Y), T + 1) :- 
+can_move(N, (X1, Y), (X2, Y), T + 1) :- 
     dim((X1, Y)), dim((X2, Y)), 
     X1 != X2, time(T + 1),
-    at(T + 1, L, v, (X1, Y), _), 
+    at(T + 1, L, v, (X1, Y), N), 
     P = X2,
     A = X1 - 1,
     free_range(T+1, (P, Y), (A, Y)).
 
 % Horizontal
-can_move((X, Y1), (X, Y2), T + 1) :- 
+can_move(N, (X, Y1), (X, Y2), T + 1) :- 
     dim((X, Y1)), dim((X, Y2)), 
     Y1 != Y2, time(T + 1),
-    at(T + 1, L, h, (X, Y1), _), 
+    at(T + 1, L, h, (X, Y1), N), 
     P = Y1 + L,
     A = Y2 + L - 1,
     free_range(T+1, (X, P), (X, A)).
 
-can_move((X, Y1), (X, Y2), T + 1) :- 
+can_move(N, (X, Y1), (X, Y2), T + 1) :- 
     dim((X, Y1)), dim((X, Y2)), 
     Y1 != Y2, time(T + 1),
-    at(T+1, L, h, (X, Y1), _), 
+    at(T+1, L, h, (X, Y1), N), 
     P = Y2,
     A = Y1 - 1,
     free_range(T+1, (X, P), (X, A)).
-
-
-% reachable(Exit, T) :- goal(T), exit(0, Exit).
-% reachable((X1, Y1), T) :- move((X1, Y1), (X2, Y2), T), reachable((X2, Y2), T + 1).
-
-% valid_move((X1, Y1), (X2, Y2), T) :- move((X1, Y1), (X2, Y2), T), reachable((X2, Y2), T + 1).
-
-% goal(T):- at(T, _, _, Exit, N), exit(N, Exit), time(T).
-% :- not goal(T), time(T).
-% #minimize { T : goal(T) }.
-% :- not goal(T), time(T).
 
 
 % Constraint to ensure that the goal is achieved at some time T
 :- not at(_, _, _, Exit, N), exit(N, Exit).
 
 % Minimize the time T at which the goal is achieved
-#minimize { T : move(T, _, _) }.
+#minimize { T : move(T, _, _, _) }.
 
 
 
 
-#show at/5.
+% #show at/5.
 % #show occupied/2.
 % #show not_occupied/2.
 % #show free_range/3.
-% #show move/3.
+#show move/4.
 % #show valid_move/3.
 % #show can_move/3.

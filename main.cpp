@@ -35,13 +35,16 @@ bool parse_atom(const std::string& atom, int& T, std::string& predicate, std::st
 }
 
 int main(int argc, char* argv[]) {
-    if (argc < 2) {
-        std::cerr << "Usage: " << argv[0] << " <clingo_file.asp>" << std::endl;
+    if (argc < 3) {
+        std::cerr << "Usage: " << argv[0] << " <clingo_file.asp> <clingo_file.asp>" << std::endl;
         return 1;
     }
 
-    std::string filename = argv[1];
-    std::string command = "clingo -n 10 " + filename;
+
+
+    std::string filename1 = argv[1];
+    std::string filename2 = argv[2];
+    std::string command = "clingo -n 0 " + filename1 + " " + filename2;
 
     // Open the command for reading
     FILE* pipe = popen(command.c_str(), "r");

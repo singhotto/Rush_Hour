@@ -1,0 +1,1 @@
+/Library/Developer/CommandLineTools/usr/bin/c++  -arch arm64 -isysroot /Library/Developer/CommandLineTools/SDKs/MacOSX15.1.sdk -mmacosx-version-min=14.6 -Wl,-search_paths_first -Wl,-headerpad_max_install_names CMakeFiles/main.dir/main.cpp.o CMakeFiles/main.dir/utils/ImgGenerator.cc.o CMakeFiles/main.dir/lib/stb_image.cc.o CMakeFiles/main.dir/lib/stb_image_write.cc.o -o main 

@@ -1,0 +1,3 @@
+/Users/singhotto/Documents/Answer Set Programming/rush_hour/gif_maker/build/CMakeFiles/main.dir
+/Users/singhotto/Documents/Answer Set Programming/rush_hour/gif_maker/build/CMakeFiles/edit_cache.dir
+/Users/singhotto/Documents/Answer Set Programming/rush_hour/gif_maker/build/CMakeFiles/rebuild_cache.dir
