@@ -1,135 +1,190 @@
 #include <iostream>
+#include <unistd.h>
 #include <string>
-#include <map>
-#include <vector>
-#include <cstdlib>
-#include <cstdio>
-#include <sstream>
-#include <algorithm>
+#include <stdexcept>
+#include <getopt.h>
+#include "resolver/Resolver.hh"
+#include "gif_maker/GifCreater.hh"
 
-// Function to trim whitespace from both ends of a string
-std::string trim(const std::string& s) {
-    size_t start = s.find_first_not_of(" \t\r\n");
-    size_t end = s.find_last_not_of(" \t\r\n");
-    if (start == std::string::npos) return "";
-    return s.substr(start, end - start + 1);
+
+std::string getFolderPath(const std::string &filePath)
+{
+    size_t pos = filePath.find_last_of("/\\"); // Find the last directory separator
+    if (pos == std::string::npos)
+    {
+        return ""; // No separator found, return empty string
+    }
+    return filePath.substr(0, pos); // Return the part before the separator
 }
 
-// Function to parse an atom and extract T and the atom string
-bool parse_atom(const std::string& atom, int& T, std::string& predicate, std::string& full_atom) {
-    size_t first_paren = atom.find('(');
-    size_t comma = atom.find(',', first_paren);
-    if (first_paren == std::string::npos || comma == std::string::npos)
-        return false;
-    
-    std::string T_str = atom.substr(first_paren + 1, comma - first_paren - 1);
-    try {
-        T = std::stoi(trim(T_str));
-    } catch (...) {
-        return false;
+std::string getFileName(const std::string &filePath)
+{
+    size_t pos = filePath.find_last_of("/\\"); // Find the last directory separator
+    if (pos == std::string::npos)
+    {
+        return filePath; // If no separator is found, the whole path is the file name
     }
+    return filePath.substr(pos + 1); // Return the part after the separator
+}
+
+// Helper function to get absolute path
+std::string getAbsolutePath(const std::string &relativePath)
+{
+    char *absPath = realpath(relativePath.c_str(), nullptr);
+    if (absPath == nullptr)
+    {
+        throw std::runtime_error("Failed to resolve absolute path.");
+    }
+    std::string absolutePath(absPath);
+    free(absPath);
+    return absolutePath;
+}
+
+void showHelp() {
+    std::cout << "Usage: ./main [OPTIONS]\n"
+              << "Options:\n"
+              << "  -i  <input file>                  Specify input file\n"
+              << "  -F <input folder>                Specify input folder\n"
+              << "  -l  <logic file>                  Specify logic file\n"
+              << "  -s  <solution file>               Specify soltion file\n"
+              << "  -S <solution folder>             Specify soltion folder\n"
+              << "  -o <output solution folder>      Specify soltion folder\n"
+              << "  -g                                Generate gif\n"
+              << "  -G <output gif folder>            Specify soltion folder\n"
+              << "  -h                                Show this help message\n";
+}
+
+void cmd_input(int argc, char* argv[], std::string& inputFile, std::string& inputFolder, std::string& logicFile, std::string& solutionFile, std::string& solutionFolder, std::string& outputSolution, std::string& outputGif, bool& gen_gif) {
+    int opt;
     
-    predicate = trim(atom.substr(0, first_paren)); // Extract the predicate name
-    full_atom = trim(atom); // Store the full atom for later use
-    return true;
+    // Define the long options
+    static struct option long_options[] = {
+        {"input-file", required_argument, nullptr, 'i'},
+        {"input-folder", required_argument, nullptr, 'f'},
+        {"logic-file", required_argument, nullptr, 'l'},
+        {"solution-file", required_argument, nullptr, 's'},
+        {"solution-folder", required_argument, nullptr, 'F'},
+        {"output-solution", required_argument, nullptr, 'o'},
+        {"output-gif", required_argument, nullptr, 'G'},
+        {"gen-gif", no_argument, nullptr, 'g'},
+        {"help", no_argument, nullptr, 'h'},
+        {nullptr, 0, nullptr, 0}
+    };
+
+    // Parse the command line arguments using getopt_long
+    while ((opt = getopt_long(argc, argv, "i:f:l:s:F:o:G:gh", long_options, nullptr)) != -1) {
+        switch (opt) {
+            case 'i':
+                inputFile = optarg;
+                break;
+            case 'F':
+                inputFolder = optarg;
+                break;
+            case 'l':
+                logicFile = optarg;
+                break;
+            case 's':
+                solutionFile = optarg;
+                break;
+            case 'S':
+                solutionFolder = optarg;
+                break;
+            case 'o':
+                outputSolution = optarg;
+                break;
+            case 'G':
+                outputGif = optarg;
+                break;
+            case 'g':
+                gen_gif = true;
+                break;
+            case 'h':
+                showHelp();
+                return;
+            default:
+                showHelp();
+                return;
+        }
+    }
+}
+
+int getOption(const std::string& inputFile, 
+                   const std::string& inputFolder, 
+                   const std::string& logicFile, 
+                   const std::string& solutionFile, 
+                   const std::string& solutionFolder, 
+                   const std::string& outputSolution, 
+                   const std::string& outputGif,
+                   const bool gen_gif) {
+
+    if ((!inputFile.empty() || !inputFolder.empty()) && (!solutionFile.empty() || !solutionFolder.empty())) {
+        std::cout<<"Cannot specify both input and solution.\n";
+        return 0;
+    }
+
+    if (inputFile.empty() && inputFolder.empty() && solutionFile.empty() && solutionFolder.empty()) {
+        std::cout<<"Please provide Files.\n";
+        return 0;
+    }
+
+    if ((!inputFile.empty() || !inputFolder.empty()) && logicFile.empty()) {
+        std::cout<<"Input provided, but Logic File is missing.\n";
+        return 0;
+    }
+
+    if((!solutionFile.empty() || !solutionFolder.empty()) && outputGif.empty()){
+        std::cout<<"Please provide Path to save gif.\n";
+        return 0;
+    }
+
+    if((!inputFile.empty() || !inputFolder.empty())&& gen_gif && outputGif.empty()){
+        std::cout<<"Please provide Path to save gif.\n";
+        return 0;
+    }
+
+    if(!inputFile.empty()){
+        return 1;
+    }
+
+    if(!inputFolder.empty()){
+        return 2;
+    }
+
+    if(!solutionFile.empty()){
+        return 3;
+    }
+
+    if(!solutionFolder.empty()){
+        return 4;
+    }
 }
 
 int main(int argc, char* argv[]) {
-    if (argc < 3) {
-        std::cerr << "Usage: " << argv[0] << " <clingo_file.asp> <clingo_file.asp>" << std::endl;
-        return 1;
+    std::string inputFile, inputFolder, logicFile, solutionFile, solutionFolder, outputSolution, outputGif;
+    bool gen_gif = false;
+
+    cmd_input(argc, argv, inputFile, inputFolder, logicFile, solutionFile, solutionFolder, outputSolution, outputGif, gen_gif);
+    
+    int op = getOption(inputFile, inputFolder, logicFile, solutionFile, solutionFolder, outputSolution, outputGif, gen_gif);
+
+    std::cout<<op<<"\n";
+    if(!op){
+        return 0;
     }
 
-
-
-    std::string filename1 = argv[1];
-    std::string filename2 = argv[2];
-    std::string command = "clingo -n 0 " + filename1 + " " + filename2;
-
-    // Open the command for reading
-    FILE* pipe = popen(command.c_str(), "r");
-    if (!pipe) {
-        std::cerr << "Failed to run clingo command." << std::endl;
-        return 1;
+    if(op == 1){
+        Resolver& resolver =  Resolver::getInstance();
+        inputFile = getAbsolutePath(inputFile);
+        logicFile = getAbsolutePath(logicFile);
+        resolver.resolve(inputFile, logicFile);
+        outputSolution = getAbsolutePath(getFolderPath(outputSolution)) + "/" + getFileName(outputSolution);
+        resolver.save(outputSolution);
     }
 
-    std::string line;
-    bool in_answer = false;
-    int current_answer = 0;
-    std::map<int, std::map<std::string, std::vector<std::string>>> grouped_atoms;
-    std::vector<std::map<int, std::map<std::string, std::vector<std::string>>>> all_answers;
-    std::string summary;
-
-    char buffer[4096];
-    while (fgets(buffer, sizeof(buffer), pipe) != nullptr) {
-        line = buffer;
-        std::string trimmed = trim(line);
-
-        if (trimmed.empty()) {
-            continue;
-        }
-
-        if (trimmed.find("Answer:") == 0) {
-            if (in_answer) {
-                // Save the previous answer
-                all_answers.push_back(grouped_atoms);
-                grouped_atoms.clear();
-            }
-            in_answer = true;
-        } else if (trimmed.find("SATISFIABLE") == 0 || trimmed.find("UNSATISFIABLE") == 0 ||
-                   trimmed.find("Models") == 0 || trimmed.find("Calls") == 0 ||
-                   trimmed.find("Time") == 0 || trimmed.find("CPU Time") == 0) {
-            summary += trimmed + "\n";
-        } else if (in_answer) {
-            std::istringstream iss(trimmed);
-            std::string atom;
-            while (iss >> atom) {
-                int T;
-                std::string predicate, full_atom;
-                if (parse_atom(atom, T, predicate, full_atom)) {
-                    grouped_atoms[T][predicate].push_back(full_atom);
-                } else {
-                    grouped_atoms[-1]["invalid"].push_back(atom);
-                }
-            }
-        }
-    }
-
-    // After the loop, save the last answer if any
-    if (in_answer && !grouped_atoms.empty()) {
-        all_answers.push_back(grouped_atoms);
-    }
-
-    pclose(pipe);
-
-    // Print all answers
-    for (size_t i = 0; i < all_answers.size(); ++i) {
-        std::cout << "Answer: " << (i + 1) << std::endl;
-        const auto& answer = all_answers[i];
-        std::vector<int> T_values;
-        for (const auto& T_entry : answer) {
-            T_values.push_back(T_entry.first);
-        }
-        std::sort(T_values.begin(), T_values.end());
-
-        for (const auto& T : T_values) {
-            std::cout << "T = " << T << ":" << std::endl;
-            const auto& predicates_map = answer.at(T);
-            for (const auto& [predicate, atoms] : predicates_map) {
-                std::cout << "  " << predicate << ": ";
-                for (const auto& atom : atoms) {
-                    std::cout << atom << " ";
-                }
-                std::cout << std::endl;
-            }
-            std::cout << std::endl; // Extra line between groups
-        }
-        std::cout << std::endl; // Extra line between answers
-    }
-
-    // Print the summary
-    if (!summary.empty()) {
-        std::cout << summary;
+    if(gen_gif || !outputGif.empty()){
+        GifCreater generator;
+        generator.create(inputFile, outputSolution, 5);
+        generator.save(outputGif);
     }
 
     return 0;

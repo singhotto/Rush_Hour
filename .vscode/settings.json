@@ -2,11 +2,14 @@
     "files.associations": {
         "*.cc": "cpp",
         "*.asp": "asp",
+        "*.ipl": "javascriptreact",
         "string": "cpp",
         "__hash_table": "cpp",
         "__tree": "cpp",
         "map": "cpp",
         "string_view": "cpp",
-        "unordered_map": "cpp"
-    }
+        "unordered_map": "cpp",
+        "ostream": "cpp"
+    },
+    "C_Cpp.errorSquiggles": "disabled"
 }
