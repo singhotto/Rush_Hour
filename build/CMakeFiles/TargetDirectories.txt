@@ -1,3 +1,0 @@
-/Users/singhotto/Documents/Answer Set Programming/rush_hour/build/CMakeFiles/main.dir
-/Users/singhotto/Documents/Answer Set Programming/rush_hour/build/CMakeFiles/edit_cache.dir
-/Users/singhotto/Documents/Answer Set Programming/rush_hour/build/CMakeFiles/rebuild_cache.dir
