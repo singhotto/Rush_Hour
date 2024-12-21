@@ -1,5 +1,5 @@
 % Time domain
-time(0..18). % Limit the planning horizon to 10 steps
+time(0..100). % Limit the planning horizon to 10 steps
 
 at(0, L, D, A, N) :- car(N, L, D, A).
 

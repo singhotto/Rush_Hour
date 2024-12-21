@@ -72,7 +72,11 @@ std::vector<uint8_t> GifCreater::loadImg(std::string path, bool alph)
             grid[ss++] = pixel[0]; // Red
             grid[ss++] = pixel[1]; // Green
             grid[ss++] = pixel[2]; // Blue
-            grid[ss++] = 255;      // Alpha (fully opaque)
+            if((pixel[0] + pixel[1] + pixel[2]) == 0){
+                grid[ss++] = 0;
+            }else{
+                grid[ss++] = 255; // Alpha (fully opaque)
+            }
         }
     }
 
@@ -132,9 +136,16 @@ void GifCreater::replacePixel(int fx, int fy, int tx, int ty,
             int srcIdx = (s_y + x) * 4;
             int dstIdx = (d_y + fx + x) * 4;
 
-            for (int i = 0; i < 3; i++)
-            {
-                original[dstIdx + i] = dataImg[srcIdx + i];
+            if(dataImg[srcIdx + 3] != 0){
+                for (int i = 0; i < 3; i++)
+                {
+                    original[dstIdx + i] = dataImg[srcIdx + i];
+                }
+            }else{
+                for (int i = 0; i < 3; i++)
+                {
+                    original[dstIdx + i] = grid[dstIdx + i];
+                }
             }
         }
     }
@@ -174,7 +185,6 @@ void GifCreater::createGif(std::string file_path)
     GifEnd(&g);
 }
 
-
 std::vector<uint8_t> GifCreater::getCarImg(int i, int s, bool v)
 {
     i++;
@@ -207,9 +217,11 @@ std::vector<uint8_t> GifCreater::getCarImg(int i, int s, bool v)
 
 void GifCreater::init()
 {
+    images.clear();
     images.push_back(getGrid());
 
     int i = 0;
+    cars.clear();
     cars.reserve(init_cars.size());
     for (auto x : init_cars)
     {
@@ -223,15 +235,16 @@ void GifCreater::init()
 
 void GifCreater::renderMoves()
 {
-    if(moves.size() == 0){
-        std::cout<<"No moves!\n";
+    if (moves.size() == 0)
+    {
+        std::cout << "No moves!\n";
     }
     for (auto x : moves)
     {
         Init c = getCar(x.car_id);
         Coordinates from = getCoordinates(x.from.first, x.from.second, c.len, c.v);
         Coordinates to = getCoordinates(x.to.first, x.to.second, c.len, c.v);
-        
+
         moveCar(x.car_id, from, to, c.len, c.v);
     }
 }
@@ -318,6 +331,8 @@ void GifCreater::moveCar(int id, Coordinates from, Coordinates to, int car_size,
 
 void GifCreater::create(std::string init_path, std::string move_path, int idx)
 {
+    init_cars.clear();
+    moves.clear();
     std::ifstream file(init_path);
     std::string line;
 
@@ -373,7 +388,9 @@ void GifCreater::create(std::string init_path, std::string move_path, int idx)
                 if (answer_num == idx)
                 {
                     recording_moves = true; // Start recording moves when we match the target answer
-                }else if(answer_num > idx){
+                }
+                else if (answer_num > idx)
+                {
                     break;
                 }
                 current_answer = answer_num;
