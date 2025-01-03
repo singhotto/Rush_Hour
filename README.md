@@ -6,3 +6,13 @@
 //store time for file
 ./main -i ../input/input2.asp -l ../asp/rush_hour.asp -S ../solutions -t ../data/test.csv
 
+
+
+
+--parallel-mode=4
+
+--heuristic=vsids
+
+--stats
+
+find . -type f \( -name "*advance*" -o -name "*expert*" \) -exec rm -f {} \;

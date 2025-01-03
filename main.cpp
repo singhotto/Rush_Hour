@@ -18,7 +18,7 @@ std::string getFileName(const std::string &filePath)
     return filePath.substr(pos + 1); // Return the part after the separator
 }
 
-void writeInfo(std::string file, std::string test_name, int models, int calls, float solving, float first_model, float unsat, float cpu_time, int cars, int three_cell_cars, int two_cell_cars, int moves, int occupied_cell, bool exist = false) {
+void writeInfo(std::string file, std::string test_name, int models, int calls, float time, float solving, float first_model, float unsat, float cpu_time, int cars, int three_cell_cars, int two_cell_cars, int moves, int occupied_cell, float choices, float conflicts, float restarts, float binary, float ternary, bool use_heuristic, bool exist = false) {
 
     // Open the file in append mode if it exists, otherwise create it
     std::ofstream csvFile(file, exist ? std::ios::app : std::ios::out);
@@ -30,7 +30,7 @@ void writeInfo(std::string file, std::string test_name, int models, int calls, f
 
     // Write the header only if the file is being created
     if (!exist) {
-        csvFile << "file,N_Models,Calls,CPU_Time,Solving,First_Model,Unsat,Cars,Three_Cell_Car,Two_Cell_Car,Moves,Empty_Cells,Occupied_Cells\n";
+        csvFile << "file,N_Models,Calls,CPU_Time,Time,Solving,First_Model,Unsat,Cars,Three_Cell_Car,Two_Cell_Car,Moves,Empty_Cells,Occupied_Cells,Choices,Conflicts,Restarts,Binary,Ternary,Heuristic \n";
     }
 
     // Write the data row
@@ -38,6 +38,7 @@ void writeInfo(std::string file, std::string test_name, int models, int calls, f
             << models << "," 
             << calls << "," 
             << cpu_time << "," 
+            << time << "," 
             << solving << "," 
             << first_model << "," 
             << unsat << ","
@@ -46,7 +47,13 @@ void writeInfo(std::string file, std::string test_name, int models, int calls, f
             << two_cell_cars << ","
             << moves << ","
             << 36 - occupied_cell << ","
-            << occupied_cell
+            << occupied_cell << ","
+            << choices << ","
+            << conflicts << ","
+            << restarts << ","
+            << binary << ","
+            << ternary << ","
+            << use_heuristic
             << "\n";
 
     // Close the file
@@ -275,6 +282,8 @@ int getOption(const std::string &inputFile,
 int main(int argc, char *argv[])
 {
     GifCreater generator;
+    int n_models = 1;
+    bool use_h = true;
     std::string inputFile, inputFolder, logicFile, solutionFile, solutionFolder, infoFile, outputGif;
     bool gen_gif = false;
 
@@ -296,7 +305,7 @@ int main(int argc, char *argv[])
            infoFile = getFolderPath(infoFile)+ "/"+ getFileName(infoFile);
         }
         std::cout << "Resolving Problem.\n";
-        resolver.resolve(inputFile, logicFile);
+        resolver.resolve(inputFile, logicFile, n_models, use_h);
         std::cout << "Problem resolved.\n\n";
         std::string solutionFolder1 = getAbsolutePath(solutionFolder) + "/solution_" + getFileName(inputFile);
         std::cout << "Saving Solution.\n";
@@ -305,11 +314,12 @@ int main(int argc, char *argv[])
         if(!infoFile.empty()){
             std::cout << "Saving Time. \n";
             int models, calls;
-            float solving, first_model, unsat, cpu_time;
+            float solving, first_model, unsat, cpu_time, time;
+            float choices, conflicts, restarts, binary, ternary;
             int cars, moves, occupied_cell, three_cell_cars, two_cell_cars;
                             
-            resolver.getInfo(models, calls, solving, first_model, unsat, cpu_time, cars, three_cell_cars, two_cell_cars, moves, occupied_cell);
-            writeInfo(infoFile, getFileName(inputFile), models, calls, solving, first_model, unsat, cpu_time, cars, three_cell_cars, two_cell_cars, moves, occupied_cell);
+            resolver.getInfo(models, calls, time, solving, first_model, unsat, cpu_time, cars, three_cell_cars, two_cell_cars, moves, occupied_cell, choices, conflicts, restarts, binary, ternary);
+            writeInfo(infoFile, getFileName(inputFile), models, calls, time, solving, first_model, unsat, cpu_time, cars, three_cell_cars, two_cell_cars, moves, occupied_cell, choices, conflicts, restarts, binary, ternary, use_h);
             std::cout << "Time Saved. \n";
         }
     }
@@ -327,7 +337,8 @@ int main(int argc, char *argv[])
         solutionFolder = getAbsolutePath(solutionFolder);
         bool exists = false;
         int models, calls;
-        float solving, first_model, unsat, cpu_time; 
+        float time, solving, first_model, unsat, cpu_time; 
+        float choices, conflicts, restarts, binary, ternary;
         int cars, moves, occupied_cell, three_cell_cars, two_cell_cars;
         for (auto &file : files)
         {
@@ -336,7 +347,7 @@ int main(int argc, char *argv[])
             std::cout << "*************************\n";
 
             std::cout << "Resolving Problem: " << current_file << "\n";
-            resolver.resolve(file, logicFile);
+            resolver.resolve(file, logicFile, n_models, use_h);
             std::cout << "Problem resolved: " << current_file << "\n\n";
 
             std::cout << "Saving Solution: " << current_file << "\n";
@@ -346,8 +357,8 @@ int main(int argc, char *argv[])
             if(!infoFile.empty()){
                 std::cout << "Saving Time. \n";
                 
-                resolver.getInfo(models, calls, solving, first_model, unsat, cpu_time, cars, three_cell_cars, two_cell_cars, moves, occupied_cell);
-                writeInfo(infoFile, getFileName(current_file), models, calls, solving, first_model, unsat, cpu_time, cars, three_cell_cars, two_cell_cars, moves, occupied_cell, exists);
+                resolver.getInfo(models, calls, time, solving, first_model, unsat, cpu_time, cars, three_cell_cars, two_cell_cars, moves, occupied_cell, choices, conflicts, restarts, binary, ternary);
+                writeInfo(infoFile, getFileName(current_file), models, calls, time, solving, first_model, unsat, cpu_time, cars, three_cell_cars, two_cell_cars, moves, occupied_cell, choices, conflicts, restarts, binary, ternary, use_h, exists);
                 exists = true;
                 std::cout << "Time Saved. \n";
             }

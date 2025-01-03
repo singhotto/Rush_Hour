@@ -74,14 +74,26 @@ std::vector<std::string> getPositions(std::string filename, int size, bool exper
 
     if(expert){
         min = 1;
-        max = 7756;
+        max = 500;
     }else{
-        min = 7756;
-        max = 500000;
+        min = 4000;
+        max = 8000;
     }
 
+    std::vector<int> ln;
+    ln.reserve(size);
+    bool isUnique = false;
+
     for(int i = 0; i<size; i++){
-        int lineNumber = getRandomNumber(min, max);
+        isUnique = false;
+        while(!isUnique){
+            int randomNum = getRandomNumber(min, max);
+            if (std::find(ln.begin(), ln.end(), randomNum) == ln.end()) {
+                ln.push_back(randomNum);
+                isUnique = true;
+            }
+        }
+        int lineNumber = ln.back();
         std::string line = getLineFromFile(file, lineNumber);
         if (!line.empty()) {
             std::string position = getSecondString(line);
@@ -177,8 +189,12 @@ void writeFile(std::string& filename, std::vector<Car>& cars){
 }
 
 int main() {
+
+    //change both
     bool expert = true;
-    int start = 12;
+    int start = 41;
+
+
     std::string outFile;
     if(expert){
         outFile = "../input/input_expert_";
@@ -186,7 +202,7 @@ int main() {
     }else{
         outFile = "../input/input_advance_";
     }
-    std::vector<std::string> positions = getPositions("rush.txt", 20, expert);
+    std::vector<std::string> positions = getPositions("rush.txt", 30, expert);
 
     for(auto pos : positions){
         std::vector<Car> cars = parseRushHour(pos);

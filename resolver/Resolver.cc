@@ -72,16 +72,21 @@ Resolver &Resolver::getInstance()
     return instance;
 }
 
-void Resolver::saveTime(std::string &time)
+void Resolver::saveTime(std::string &t_time)
 {
     // Regular expressions for each field
     std::regex models_regex(R"(^Models\s*:\s*(\d+))", std::regex::icase);
     std::regex calls_regex(R"(^Calls\s*:\s*(\d+))", std::regex::icase);
-    std::regex time_details_regex(R"(\bSolving:\s*([\d.]+)s\b.*\b1st Model:\s*([\d.]+)s\b.*\bUnsat:\s*([\d.]+)s\b)", std::regex::icase);
+    std::regex time_details_regex(R"(\s*([\d.]+)s\b.*\b\bSolving:\s*([\d.]+)s\b.*\b1st Model:\s*([\d.]+)s\b.*\bUnsat:\s*([\d.]+)s\b)", std::regex::icase);
     std::regex cpu_time_regex(R"(^CPU Time\s*:\s*([\d.]+))", std::regex::icase);
 
+    std::regex choices_regex(R"(^Choices\s*:\s*(\d+))", std::regex::icase);
+    std::regex conflicts_regex(R"(^Conflicts\s*:\s*(\d+)\s*\(Analyzed:\s*(\d+)\))", std::regex::icase);
+    std::regex restarts_regex(R"(^Restarts\s*:\s*(\d+)\s*\(Average:\s*([\d.]+)\s*Last:\s*([\d.]+)\))", std::regex::icase);
+    std::regex constraints_regex(R"(^Constraints\s*:\s*(\d+)\s*\(Binary:\s*([\d.]+)%\s*Ternary:\s*([\d.]+)%\s*Other:\s*([\d.]+)%\))", std::regex::icase);
+
     // Process each line of the input
-    std::istringstream ss(time);
+    std::istringstream ss(t_time);
     std::string line;
 
     while (std::getline(ss, line)) {
@@ -91,24 +96,60 @@ void Resolver::saveTime(std::string &time)
         } else if (std::regex_search(line, match, calls_regex)) {
             calls = std::stoi(match[1].str());
         } else if (line.find("Time") != std::string::npos && std::regex_search(line, match, time_details_regex)) {
-            solving = std::stof(match[1].str());
-            first_model = std::stof(match[2].str());
-            unsat = std::stof(match[3].str());
+            time = std::stof(match[1].str());
+            solving = std::stof(match[2].str());
+            first_model = std::stof(match[3].str());
+            unsat = std::stof(match[4].str());
         } else if (std::regex_search(line, match, cpu_time_regex)) {
             cpu_time = std::stof(match[1].str());
+        } else if (std::regex_search(line, match, choices_regex)) {
+            choices = std::stof(match[1].str());
+        } else if (std::regex_search(line, match, conflicts_regex)) {
+            conflicts = std::stof(match[1].str());
+        } else if (std::regex_search(line, match, restarts_regex)) {
+            restarts = std::stof(match[1].str());
+        } else if (std::regex_search(line, match, constraints_regex)) {
+            binary = std::stof(match[2].str());
+            ternary = std::stof(match[3].str());
         }
     }
 }
 
-void Resolver::resolve(const std::string &input, const std::string &logic, int n)
+void Resolver::printStats()
+{
+    std::cout << "Models       : " << models << std::endl;
+    std::cout << "Calls        : " << calls << std::endl;
+    std::cout << "Time         : " << time << "s (Solving: " << solving << "s 1st Model: " << first_model 
+              << "s Unsat: " << unsat << "s)" << std::endl;
+    std::cout << "CPU Time     : " << cpu_time << "s" << std::endl;
+    std::cout << "Choices      : " << choices << std::endl;
+    std::cout << "Conflicts    : " << conflicts << std::endl;
+    std::cout << "Restarts     : " << restarts << " (Average: " << (conflicts / restarts)
+              << " Last: " << restarts << ")" << std::endl;
+    std::cout << "Constraints  : Binary: " << binary << "% Ternary: " << ternary << "% Other: " 
+              << (100.0 - binary - ternary) << "%" << std::endl;
+    std::cout << "Cars         : " << cars << std::endl;
+    std::cout << "Moves        : " << moves << std::endl;
+    std::cout << "Occupied Cells: " << occupied_cell << std::endl;
+    std::cout << "Three-Cell Cars: " << three_cell_cars << std::endl;
+    std::cout << "Two-Cell Cars: " << two_cell_cars << std::endl;
+}
+
+void Resolver::resolve(const std::string &input, const std::string &logic, int n, bool vsids)
 {
     if(n == 0) n = 1000;
     cars = occupied_cell = three_cell_cars = two_cell_cars = 0;
     getCarsInfo(input, cars, occupied_cell, three_cell_cars, two_cell_cars);
 
     // Construct the command with absolute paths
-    std::string command = "clingo -n " + std::to_string(n) + " \"" + input + "\" \"" + logic + "\"" +  " 2>/dev/null";;
-    
+    std::string command;
+
+    if(vsids){
+        command = "clingo -n " + std::to_string(n) + " --parallel-mode=8 --heuristic=domain \"" + input + "\" \"" + logic + "\" --stats" +  " 2>/dev/null";;
+    }else{
+        command = "clingo -n " + std::to_string(n) + " --parallel-mode=8 \"" + input + "\" \"" + logic + "\" --stats" +  " 2>/dev/null";;
+    }
+    std::cout<<"Command: "<<command<<"\n";
     // Open the command for reading
     FILE *pipe = popen(command.c_str(), "r");
     if (!pipe)
@@ -155,7 +196,10 @@ void Resolver::resolve(const std::string &input, const std::string &logic, int n
         }
         else if (trimmed.find("SATISFIABLE") == 0 || trimmed.find("UNSATISFIABLE") == 0 ||
                  trimmed.find("Models") == 0 || trimmed.find("Calls") == 0 ||
-                 trimmed.find("Time") == 0 || trimmed.find("CPU Time") == 0)
+                 trimmed.find("Time") == 0 || trimmed.find("CPU Time") == 0 ||
+                 trimmed.find("Restarts") == 0 ||
+                 trimmed.find("Constraints") == 0 || 
+                 trimmed.find("Choices") == 0 || trimmed.find("Conflicts") == 0)
         {
             summary += trimmed + "\n";
         }
@@ -192,10 +236,11 @@ void Resolver::resolve(const std::string &input, const std::string &logic, int n
     saveTime(summary);
 }
 
-void Resolver::getInfo(int &models, int &calls, float &solving, float &first_model, float &unsat, float &cpu_time, int& cars, int& three_cell_cars, int& two_cell_cars, int& moves, int& occupied_cell)
+void Resolver::getInfo(int &models, int &calls, float &time, float &solving, float &first_model, float &unsat, float &cpu_time, int& cars, int& three_cell_cars, int& two_cell_cars, int& moves, int& occupied_cell, float &choices, float &conflicts, float &restarts, float &binary, float &ternary)
 {
     models = this->models;
     calls = this->calls;
+    time = this->time;
     solving = this->solving;
     first_model = this->first_model;
     unsat = this->unsat;
@@ -205,6 +250,11 @@ void Resolver::getInfo(int &models, int &calls, float &solving, float &first_mod
     two_cell_cars = this->two_cell_cars;
     moves = this->moves;
     occupied_cell = this->occupied_cell;
+    choices = this->choices;
+    conflicts = this->conflicts;
+    restarts = this->restarts;
+    binary = this->binary;
+    ternary = this->ternary;
 }
 
 void Resolver::save(const std::string &output)

@@ -74,6 +74,9 @@ can_move(N, (X, Y1), (X, Y2), 0) :-
 
 :- move(t, A, B, N), move(t-1, B, A, N).
 
+% TODO: try inserting overlap 
+% and add contraint to avoid car exit from grid
+
 
 at(t, L, D, A, N) :-
     at(t-1, L, D, A, N),
