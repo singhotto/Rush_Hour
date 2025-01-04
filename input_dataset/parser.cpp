@@ -192,7 +192,7 @@ int main() {
 
     //change both
     bool expert = true;
-    int start = 41;
+    int start = 11;
 
 
     std::string outFile;
@@ -202,7 +202,7 @@ int main() {
     }else{
         outFile = "../input/input_advance_";
     }
-    std::vector<std::string> positions = getPositions("rush.txt", 30, expert);
+    std::vector<std::string> positions = getPositions("rush.txt", 100, expert);
 
     for(auto pos : positions){
         std::vector<Car> cars = parseRushHour(pos);

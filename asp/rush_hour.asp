@@ -152,7 +152,6 @@ can_move(N, (X, Y1), (X, Y2), t) :-
 
 #program check(t).
 
-% Constraint to ensure that the goal is achieved at some time T
 :- not move(_, _, Exit, N), exit(N, Exit), query(t).
 
 #show move/4.

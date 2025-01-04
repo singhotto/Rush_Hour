@@ -6,8 +6,8 @@
 //store time for file
 ./main -i ../input/input2.asp -l ../asp/rush_hour.asp -S ../solutions -t ../data/test.csv
 
-
-
+//current
+./main -F ../input -l ../asp/rush_hour.asp -S ../solutions -t ../data/test_expert_.csv
 
 --parallel-mode=4
 
