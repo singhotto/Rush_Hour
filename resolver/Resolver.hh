@@ -34,7 +34,7 @@ private:
 public:
     static Resolver &getInstance();
 
-    void resolve(const std::string &input, const std::string &logic, int n = 10, bool vsids = false);
+    void resolve(const std::string &input, const std::string &logic, int n = 10, int opt = 0);
 
     void getInfo(int &models, int &calls, float &time, float &solving, float &first_model, float &unsat, float &cpu_time, int &cars, int &three_cell_cars, int &two_cell_cars, int &moves, int &occupied_cell, float &choices, float &conflicts, float &restarts, float &binary, float &ternary);
 

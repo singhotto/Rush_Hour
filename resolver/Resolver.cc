@@ -135,7 +135,7 @@ void Resolver::printStats()
     std::cout << "Two-Cell Cars: " << two_cell_cars << std::endl;
 }
 
-void Resolver::resolve(const std::string &input, const std::string &logic, int n, bool vsids)
+void Resolver::resolve(const std::string &input, const std::string &logic, int n, int opt)
 {
     if(n == 0) n = 1000;
     cars = occupied_cell = three_cell_cars = two_cell_cars = 0;
@@ -143,13 +143,23 @@ void Resolver::resolve(const std::string &input, const std::string &logic, int n
 
     // Construct the command with absolute paths
     std::string command;
+    // 1 = domain
+    // 2 = vsids
+    // 3 = Berkmin
+    // 4 = --no-restarts
 
-    if(vsids){
+    if(opt == 1){
         command = "clingo -n " + std::to_string(n) + " --parallel-mode=8 --heuristic=domain \"" + input + "\" \"" + logic + "\" --stats" +  " 2>/dev/null";;
+    }else if(opt == 2){
+        command = "clingo -n " + std::to_string(n) + " --parallel-mode=8 --heuristic=vsids \"" + input + "\" \"" + logic + "\" --stats" +  " 2>/dev/null";;
+    }else if(opt == 3){
+        command = "clingo -n " + std::to_string(n) + " --parallel-mode=8 --heuristic=Berkmin \"" + input + "\" \"" + logic + "\" --stats" +  " 2>/dev/null";;
+    }else if(opt == 4){
+        command = "clingo -n " + std::to_string(n) + " --parallel-mode=8 --no-restarts \"" + input + "\" \"" + logic + "\" --stats" +  " 2>/dev/null";;
     }else{
         command = "clingo -n " + std::to_string(n) + " --parallel-mode=8 \"" + input + "\" \"" + logic + "\" --stats" +  " 2>/dev/null";;
     }
-    std::cout<<"Command: "<<command<<"\n";
+    
     // Open the command for reading
     FILE *pipe = popen(command.c_str(), "r");
     if (!pipe)

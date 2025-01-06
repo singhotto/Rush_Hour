@@ -1,72 +1,72 @@
 Answer: 1
 T = -1:
-  invalid: Threads : 8 (Winner: 1) Model-Level : 66.0 Problems : 278 (Average Length: 2.00 Splits: 0) Lemmas : 10208547 (Deleted: 9032797) Binary : 224533 (Ratio: 2.20%) Ternary : 335013 (Ratio: 3.28%) Conflict : 5338008 (Average Length: 121.5 Ratio: 52.29%) Loop : 0 (Average Length: 0.0 Ratio: 0.00%) Other : 4870539 (Average Length: 40.4 Ratio: 47.71%) Distributed: 815134 (Ratio: 15.27% Average LBD: 3.46) Integrated : 4898577 (Ratio: 600.95% Unit: 114710 Average Jumps: 6.24) Backjumps : 5338550 (Average: 1.65 Max: 306 Sum: 8794154) Executed : 5337956 (Average: 1.65 Max: 306 Sum: 8793206 Ratio: 99.99%) Bounded : 594 (Average: 1.60 Max: 2 Sum: 948 Ratio: 0.01%) Rules : 169344 Choice : 9117 Atoms : 129406 Bodies : 154400 (Original: 154399) Count : 80 Equivalences : 300824 (Atom=Atom: 82391 Body=Body: 3285 Other: 215148) Tight : Yes Variables : 54940 (Eliminated: 0 Frozen: 43524) 
+  invalid: Threads : 8 (Winner: 4) Model-Level : 40.0 Problems : 276 (Average Length: 2.00 Splits: 0) Lemmas : 10980950 (Deleted: 9852699) Binary : 228090 (Ratio: 2.08%) Ternary : 357233 (Ratio: 3.25%) Conflict : 5406275 (Average Length: 87.5 Ratio: 49.23%) Loop : 0 (Average Length: 0.0 Ratio: 0.00%) Other : 5574675 (Average Length: 29.1 Ratio: 50.77%) Distributed: 933380 (Ratio: 17.26% Average LBD: 3.47) Integrated : 5609177 (Ratio: 600.95% Unit: 123880 Average Jumps: 5.59) Backjumps : 5406976 (Average: 1.65 Max: 260 Sum: 8923217) Executed : 5406448 (Average: 1.65 Max: 260 Sum: 8922309 Ratio: 99.99%) Bounded : 528 (Average: 1.72 Max: 2 Sum: 908 Ratio: 0.01%) Rules : 169278 Choice : 9103 Atoms : 129437 Bodies : 154348 (Original: 154347) Count : 80 Equivalences : 300966 (Atom=Atom: 82454 Body=Body: 3285 Other: 215227) Tight : Yes Variables : 54890 (Eliminated: 0 Frozen: 43492) 
 
 T = 1:
-  move: move(1,(6,3),(6,5),6) 
+  move: move(1,(3,5),(2,5),11) 
 
 T = 2:
-  move: move(2,(3,3),(5,3),8) 
+  move: move(2,(6,3),(6,5),6) 
 
 T = 3:
   move: move(3,(4,4),(5,4),10) 
 
 T = 4:
-  move: move(4,(3,5),(2,5),11) 
+  move: move(4,(3,3),(5,3),8) 
 
 T = 5:
-  move: move(5,(3,1),(3,2),0) 
+  move: move(5,(4,1),(4,5),3) 
 
 T = 6:
-  move: move(6,(4,1),(4,5),3) 
+  move: move(6,(5,3),(4,3),8) 
 
 T = 7:
-  move: move(7,(1,1),(4,1),7) 
+  move: move(7,(6,1),(6,2),5) 
 
 T = 8:
-  move: move(8,(2,2),(2,1),2) 
+  move: move(8,(3,1),(3,2),0) 
 
 T = 9:
-  move: move(9,(1,2),(1,1),1) 
+  move: move(9,(1,1),(5,1),7) 
 
 T = 10:
-  move: move(10,(3,2),(3,1),0) 
+  move: move(10,(2,2),(2,1),2) 
 
 T = 11:
-  move: move(11,(5,3),(2,3),8) 
+  move: move(11,(1,2),(1,1),1) 
 
 T = 12:
-  move: move(12,(6,1),(6,2),5) 
+  move: move(12,(3,2),(3,1),0) 
 
 T = 13:
-  move: move(13,(4,1),(5,1),7) 
+  move: move(13,(2,4),(1,4),9) 
 
 T = 14:
-  move: move(14,(2,4),(1,4),9) 
+  move: move(14,(4,3),(2,3),8) 
 
 T = 15:
-  move: move(15,(4,5),(4,1),3) 
+  move: move(15,(5,4),(3,4),10) 
 
 T = 16:
-  move: move(16,(2,3),(3,3),8) 
+  move: move(16,(5,5),(5,2),4) 
 
 T = 17:
-  move: move(17,(5,4),(3,4),10) 
+  move: move(17,(3,4),(5,4),10) 
 
 T = 18:
-  move: move(18,(5,5),(5,2),4) 
+  move: move(18,(4,5),(4,1),3) 
 
 T = 19:
-  move: move(19,(3,4),(5,4),10) 
+  move: move(19,(2,5),(4,5),11) 
 
 T = 20:
-  move: move(20,(1,6),(3,6),12) 
+  move: move(20,(1,4),(3,4),9) 
 
 T = 21:
-  move: move(21,(2,5),(4,5),11) 
+  move: move(21,(2,3),(3,3),8) 
 
 T = 22:
-  move: move(22,(1,4),(3,4),9) 
+  move: move(22,(1,6),(3,6),12) 
 
 T = 23:
   move: move(23,(2,1),(2,5),2) 
@@ -78,22 +78,22 @@ T = 25:
   move: move(25,(3,3),(1,3),8) 
 
 T = 26:
-  move: move(26,(4,1),(4,2),3) 
+  move: move(26,(3,1),(3,2),0) 
 
 T = 27:
-  move: move(27,(3,1),(3,2),0) 
+  move: move(27,(4,1),(4,2),3) 
 
 T = 28:
   move: move(28,(5,1),(1,1),7) 
 
 T = 29:
-  move: move(29,(4,2),(4,1),3) 
+  move: move(29,(3,2),(3,1),0) 
 
 T = 30:
-  move: move(30,(3,2),(3,1),0) 
+  move: move(30,(5,2),(5,1),4) 
 
 T = 31:
-  move: move(31,(5,2),(5,1),4) 
+  move: move(31,(4,2),(4,1),3) 
 
 T = 32:
   move: move(32,(1,3),(4,3),8) 

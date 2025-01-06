@@ -1,6 +1,6 @@
 Answer: 1
 T = -1:
-  invalid: Threads : 8 (Winner: 1) Model-Level : 12.0 Problems : 115 (Average Length: 2.00 Splits: 0) Lemmas : 180460 (Deleted: 72422) Binary : 17359 (Ratio: 9.62%) Ternary : 13035 (Ratio: 7.22%) Conflict : 55558 (Average Length: 27.9 Ratio: 30.79%) Loop : 0 (Average Length: 0.0 Ratio: 0.00%) Other : 124902 (Average Length: 14.4 Ratio: 69.21%) Distributed: 21001 (Ratio: 37.80% Average LBD: 3.16) Integrated : 125324 (Ratio: 596.75% Unit: 8812 Average Jumps: 2.80) Backjumps : 55638 (Average: 1.68 Max: 49 Sum: 93344) Executed : 55538 (Average: 1.67 Max: 49 Sum: 93144 Ratio: 99.79%) Bounded : 100 (Average: 2.00 Max: 2 Sum: 200 Ratio: 0.21%) Rules : 51378 Choice : 3359 Atoms : 36835 Bodies : 45488 (Original: 45487) Count : 40 Equivalences : 96059 (Atom=Atom: 18290 Body=Body: 1899 Other: 75870) Tight : Yes Variables : 21091 (Eliminated: 0 Frozen: 16882) 
+  invalid: Threads : 8 (Winner: 5) Model-Level : 13.0 Problems : 121 (Average Length: 2.00 Splits: 0) Lemmas : 272855 (Deleted: 172426) Binary : 18961 (Ratio: 6.95%) Ternary : 17025 (Ratio: 6.24%) Conflict : 93844 (Average Length: 33.5 Ratio: 34.39%) Loop : 0 (Average Length: 0.0 Ratio: 0.00%) Other : 179011 (Average Length: 14.6 Ratio: 65.61%) Distributed: 30046 (Ratio: 32.02% Average LBD: 3.26) Integrated : 179804 (Ratio: 598.43% Unit: 10042 Average Jumps: 2.42) Backjumps : 93926 (Average: 1.54 Max: 23 Sum: 144436) Executed : 93879 (Average: 1.54 Max: 23 Sum: 144343 Ratio: 99.94%) Bounded : 47 (Average: 1.98 Max: 2 Sum: 93 Ratio: 0.06%) Rules : 51267 Choice : 3359 Atoms : 36713 Bodies : 45377 (Original: 45376) Count : 40 Equivalences : 95690 (Atom=Atom: 18167 Body=Body: 1899 Other: 75624) Tight : Yes Variables : 21091 (Eliminated: 0 Frozen: 16882) 
 
 T = 1:
   move: move(1,(1,3),(1,2),1) 
@@ -9,13 +9,13 @@ T = 2:
   move: move(2,(2,4),(1,4),7) 
 
 T = 3:
-  move: move(3,(6,2),(6,4),4) 
+  move: move(3,(4,4),(3,4),8) 
 
 T = 4:
-  move: move(4,(4,4),(3,4),8) 
+  move: move(4,(5,2),(5,5),3) 
 
 T = 5:
-  move: move(5,(5,2),(5,4),3) 
+  move: move(5,(6,2),(6,4),4) 
 
 T = 6:
   move: move(6,(2,3),(4,3),6) 
@@ -33,7 +33,7 @@ T = 10:
   move: move(10,(4,3),(2,3),6) 
 
 T = 11:
-  move: move(11,(5,4),(5,1),3) 
+  move: move(11,(5,5),(5,1),3) 
 
 T = 12:
   move: move(12,(3,4),(4,4),8) 
@@ -45,7 +45,7 @@ T = 14:
   move: move(14,(3,1),(3,4),0) 
 
 T = 15:
-  move: move(15,(4,3),(2,3),6) 
+  move: move(15,(4,3),(3,3),6) 
 
 T = 16:
   move: move(16,(6,4),(6,1),4) 

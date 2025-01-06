@@ -1,18 +1,33 @@
-./main -i ../input/input4.asp -l ../asp/rush_hour.asp -S ../solutionsasp -G ../output
+## Build Instructions
 
-//store time for folder
+cd build
+cmake ..
+make clean
+make
+
+## Usage
+
+### Single File: Calculate Answer, Generate GIF, and Store
+
+./main -i ../input/input_beginner_2.asp -l ../asp/rush_hour.asp -S ../solutions -G ../output
+
+### Folder: Calculate Answer and Save Time
+
 ./main -F ../input -l ../asp/rush_hour.asp -S ../solutions -t ../data/test.csv
 
-//store time for file
-./main -i ../input/input2.asp -l ../asp/rush_hour.asp -S ../solutions -t ../data/test.csv
+### Single File: Store Execution Time
 
-//current
-./main -F ../input -l ../asp/rush_hour.asp -S ../solutions -t ../data/test_expert_.csv
+./main -i ../input/input_beginner_2.asp -l ../asp/rush_hour.asp -S ../solutions -t ../data/test.csv
 
---parallel-mode=4
+### Folder: Store Execution Time
 
---heuristic=vsids
+./main -F ../input -l ../asp/rush_hour.asp -S ../solutions -t ../data/test.csv
 
---stats
+### Single File: Generate and Store GIF
 
-find . -type f \( -name "*advance*" -o -name "*expert*" \) -exec rm -f {} \;
+./main -i ../input/input_beginner_2.asp -S ../solutions -G ../output
+
+### Folder: Generate and Store GIFs
+
+./main -F ../input -S ../solutions -G ../output
+
