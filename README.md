@@ -1,8 +1,11 @@
 ## Build Instructions
 
 cd build
+
 cmake ..
+
 make clean
+
 make
 
 ## Usage
